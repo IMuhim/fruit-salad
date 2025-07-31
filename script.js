@@ -31,10 +31,6 @@ async function fetchFruitData(fruit) {
   }
 }
 
-let calories = 0
-const fruitCalories = {
-    pear: 57
-}
 
 function addFruitNutrition(fruit) {
     console.log(fruit)
