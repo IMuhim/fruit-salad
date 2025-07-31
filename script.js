@@ -25,27 +25,22 @@ function addFruit(fruit){
     fruitNutrition.textContent = calories
 }
 
-// function fetchFruitData(fruit){
-//     fetch(`https://fruit-api-5v0j.onrender.com/fruits/${fruit}`)
-//         .then(processResponse)
-//         .then((data) => addFruit(data))
-//         .catch((err) => console.log(err))
-
-//     fetch(`https://pixabay.com/api/?key=${apiKey}&q=${fruit}+fruit&image_type=photo`)
-//         .then((response) => response.json())
-//         .then(data => console.log(data))
-//         .catch((err) => console.log(err))
-// }
-
-async function fetchFruitData(fruit){
-    try {
-        const response = fetch(`https://fruit-api-5v0j.onrender.com/fruits/${fruit}`)
-        const data = await response.json()
-        addFruit(data)
-    } catch (err) {
-        console.log(err)
-    }
+function fetchFruitData(fruit){
+    fetch(`https://fruit-api-5v0j.onrender.com/fruits/${fruit}`)
+        .then(processResponse)
+        .then((data) => addFruit(data))
+        .catch((err) => console.log(err))
 }
+
+// async function fetchFruitData(fruit){
+//     try {
+//         const response = fetch(`https://fruit-api-5v0j.onrender.com/fruits/${fruit}`)
+//         const data = await response.json()
+//         addFruit(data)
+//     } catch (err) {
+//         console.log(err)
+//     }
+// }
 
 function processResponse(response){
     if (response.ok){
