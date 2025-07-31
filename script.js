@@ -2,49 +2,68 @@ const fruitForm = document.querySelector("#inputSection form")
 const fruitList = document.querySelector("#fruitSection ul")
 const fruitNutrition = document.querySelector("#nutritionSection p")
 
-let calories = 0
-const apiKey = "51562102-f072248cc445aebb6bd753c4c"
-
 fruitForm.addEventListener("submit", extractFruit)
 
-function extractFruit (e) {
-    e.preventDefault()
-    fetchFruitData(e.target[0].value)
-    e.target[0].value = ""
+function extractFruit(e) {
+  e.preventDefault()
+  fetchFruitData(e.target.fruitInput.value)
+  e.target.fruitInput.value = ""
 }
 
+async function fetchFruitData(fruit) {
+  try {
+    const response = await fetch(`https://fruit-api-5v0j.onrender.com/fruits/${fruit}`)
 
-function addFruit(fruit){
-    console.log(fruit);
-    const li = document.createElement("li")
-    li.textContent = fruit.name
-    li.addEventListener("click", removeFruit, {once: true})
-    fruitList.appendChild(li);
+    const imageResponse = await fetch(`https://pixabay.com/api/?q=${fruit}+fruit&key=35290745-f05685bdfcd0a1a9b3d3833b0`)
 
-    calories += fruit.nutritions.calories
-    fruitNutrition.textContent = calories
-}
-
-function fetchFruitData(fruit){
-    fetch(`https://fruit-api-5v0j.onrender.com/fruits/${fruit}`)
-        .then(processResponse)
-        .then((data) => addFruit(data))
-        .catch((err) => console.log(err))
-
-    fetch(`https://pixabay.com/api/?key=${apiKey}&q=${fruit}+fruit&image_type=photo`)
-        .then((response) => response.json())
-        .then(data => console.log(data))
-        .catch((err) => console.log(err))
-}
-
-function processResponse(response){
-    if (response.ok){
-        return response.json()
-    }else {
-        throw "Error: http status code = 404"
+    if (response.ok && imageResponse.ok){
+      const data = await response.json()
+      const imageData = await imageResponse.json()
+      // Pass in data from fruit-api 
+      addFruitNutrition(data)
+      // Pass in imageURL and also Fruit Name
+      addImage(imageData["hits"][0]["previewURL"], data.name)
+    } else {
+      throw "Error: http status code = " + response.status
     }
+  } catch (err) {
+    console.log(err)
+  }
 }
 
-function removeFruit(e) {
-    console.log(e.target.remove())
+
+function addFruitNutrition(fruit) {
+    console.log(fruit)
+  // Define a key on fruitCalories object with value
+  fruitCalories[fruit.name] = fruit["nutritions"]["calories"]
+  // Add to the calories variable with value on data object
+  calories += fruit["nutritions"]["calories"]
+  // Display information
+  fruitNutrition.textContent = calories
+}
+
+function addImage(imageLink, fruitName){
+  // Create image element
+  const img = document.createElement("img")
+  // Add source attribute with value of imageURL
+  img.src = imageLink
+  // Add alt attribute as image name
+  img.alt = fruitName
+  // Add event listener to remove image
+  img.addEventListener("click", removeImage, { once: true })
+  fruitList.appendChild(img)
+}
+
+function removeImage(e) {
+  // When removed the 'alt' value is stored into 'fruitName' variable
+  const fruitName = e.target.alt
+  // Access the fruitCalories object under the key of fruitName
+  // Subtract that value from the calories variable
+  calories -= fruitCalories[fruitName]
+  // Updated the HTML element with new calorie information
+  fruitNutrition.textContent = calories
+  // Delete the key in the object
+  delete fruitCalories[fruitName]
+  // Remove the DOM element that triggered the event, the image
+  e.target.remove()
 }
